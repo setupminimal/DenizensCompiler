@@ -38,5 +38,5 @@ commandLine = tabs *> endBy multipleWords (char '\n')
 
 tabs = many (char '\t')
 multipleWords = sepBy (many word) (many (char ' '))
-word :: Text.Parsec.ParsecT a b c [Char]
+word :: Text.Parsec.Prim.ParsecT a b c [Char]
 word = many (noneOf " \n:\t\r")
