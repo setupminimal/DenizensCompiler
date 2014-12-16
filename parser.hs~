@@ -1,42 +1,37 @@
-import Text.Parsec
-import Control.Applicative hiding (many, optional, (<|>))
+import Text.ParserCombinators.Parsec
 
-text =
-	do
-		result <- many script
-		eof
-		return result
+script = headAndBody scriptHead clause
+	do head <- scriptHead
+	   rest <- many clause
+	   return [head, rest]
 
-script = 
-	do
-		head <- scriptStart
-		rest <- scriptInnards
-		return (head, rest)
+scriptHead =
+	do name <- phrase
+	   string ":\n"
+	   return name
 
-scriptStart =
-	do
-		result <- multipleWords
-		char ':'
-		return result
+clause =
+	do head <- clauseHead
+	   rest <- many commandLine
+	   return [head, rest]
 
-scriptInnards = many clause
+clauseHead =
+	do tabs
+	   name <- phrase
+	   string "->\n"
+	   return name
 
-clause = 
-	do
-		head <- clauseStart
-		rest <- clauseInnards
-		return (head, rest)
-
-clauseStart =
-	tabs *> (do
-				result <- multipleWords
-				(string " ->")
-				return result)
-clauseInnards = many commandLine
-
-commandLine = tabs *> endBy multipleWords (char '\n')
+commandLine :: GenParser Char st [String]
+commandLine =
+	do tabs
+	   result <- phrase
+	   eol
+	   return result
 
 tabs = many (char '\t')
-multipleWords = sepBy (many word) (many (char ' '))
-word :: Text.Parsec.Prim.ParsecT a b c [Char]
-word = many (noneOf " \n:\t\r")
+
+phrase = sepBy word (char ' ')
+
+word = many (noneOf " \n\r\t-")
+
+eol = char '\n'
