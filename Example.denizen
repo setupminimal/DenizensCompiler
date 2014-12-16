@@ -1,0 +1,17 @@
+respawnmaster (assignment):
+	assignment ->
+		trigger proximity true 10
+	interactions:
+		10 respawnmaster_interact
+
+respawnmaster_interact (interact):
+	proximity (entry) ->
+		if !player.flag[respawner] == !npc.id then queue clear
+		flag player respawnpoint:!player.location
+		flag player respawner:!npc.id
+		narrate "You reached a checkpoint!"
+
+respawnhadler (world):
+	player respawns ->
+		if !player.flag[respawnpoint] == null then queue clear
+		determine !player.flag[respawnpoint]
