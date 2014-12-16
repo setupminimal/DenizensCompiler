@@ -1,3 +1,5 @@
+module DenizenParser where
+
 import Text.ParserCombinators.Parsec
 
 denizenFile = many script
