@@ -1,14 +1,16 @@
 import Text.ParserCombinators.Parsec
 
+denizenFile = many script
+
 script =
-	do head <- scriptHead
+	do headA <- scriptHead
 	   rest <- many clause
-	   return [head, rest]
+	   return [headA, rest]
 
 scriptHead =
 	do name <- phrase
 	   string ":\n"
-	   return name
+	   return [[[name]]]
 
 clause =
 	do head <- clauseHead
@@ -19,7 +21,7 @@ clauseHead =
 	do tabs
 	   name <- phrase
 	   string "->\n"
-	   return name
+	   return [name]
 
 commandLine :: GenParser Char st [String]
 commandLine =
@@ -32,6 +34,8 @@ tabs = many (char '\t')
 
 phrase = sepBy word (char ' ')
 
-word = many (noneOf " \n\r\t-")
+word = many (noneOf " \n\r\t-:")
 
 eol = char '\n'
+
+fullParse = parse denizenFile "(unknown)"
